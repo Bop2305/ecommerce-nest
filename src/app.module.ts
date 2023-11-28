@@ -3,19 +3,24 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './role/role.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'db',
-      port: 5432,
-      username: 'root',
-      password: 'root',
-      database: 'ecommerce-db',
-      // entities: [join(__dirname, '**', '*.entity.{ts,js}')],
-      synchronize: true,
-      autoLoadEntities: true
+    ConfigModule.forRoot({ envFilePath: '.env', }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DEV_POSTGRES_HOST'),
+        port: configService.get('DEV_POSTGRES_PORT'),
+        username: configService.get('DEV_POSTGRES_USERNAME'),
+        password: configService.get('DEV_POSTGRES_PASSWORD'),
+        database: configService.get('DEV_POSTGRES_DATABASE'),
+        synchronize: true,
+        autoLoadEntities: true
+      }),
     }),
     RoleModule
   ],
