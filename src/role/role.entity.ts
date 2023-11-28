@@ -9,7 +9,7 @@ export class Role {
     @Column()
     role_name: string
 
-    @Column()
+    @Column({ nullable: true })
     role_description: string
 
     @CreateDateColumn()

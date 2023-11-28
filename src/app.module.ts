@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './role/role.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         autoLoadEntities: true
       }),
     }),
-    RoleModule
+    RoleModule,
+    PermissionModule
   ],
   controllers: [AppController],
   providers: [AppService],
