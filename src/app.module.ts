@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './role/role.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PermissionModule } from './permission/permission.module';
+import { RolepermissionModule } from './rolepermission/rolepermission.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { PermissionModule } from './permission/permission.module';
       }),
     }),
     RoleModule,
-    PermissionModule
+    PermissionModule,
+    RolepermissionModule
   ],
   controllers: [AppController],
   providers: [AppService],
