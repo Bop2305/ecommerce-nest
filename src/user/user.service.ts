@@ -4,7 +4,7 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { RoleService } from 'src/role/role.service';
-import { omitProperties } from 'src/ultils/omitProperties';
+import { omitProperties } from 'src/utils/omitProperties.utils';
 
 @Injectable()
 export class UserService {
@@ -13,6 +13,14 @@ export class UserService {
         private userRepository: Repository<User>,
         private roleService: RoleService
     ) {}
+
+    async getUserByEmail(email: string) {
+        const foundUser = this.userRepository.findOne({where: {email}})
+
+        if(!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
+
+        return foundUser
+    }
 
     async create(user: CreateUserDto): Promise<Partial<User>> {
         const {
