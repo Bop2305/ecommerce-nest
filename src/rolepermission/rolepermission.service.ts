@@ -29,7 +29,10 @@ export class RolepermissionService {
 
         if(!foundPermission) throw new HttpException('Permission not found', HttpStatus.BAD_REQUEST)
 
-        const newRolePermission = await this.rolepermissionRepository.create(rolepermission)
+        const newRolePermission = await this.rolepermissionRepository.create({
+            role: foundRole,
+            permission: foundPermission
+        })
 
         return this.rolepermissionRepository.save(newRolePermission);
     }

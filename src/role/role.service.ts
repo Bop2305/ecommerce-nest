@@ -23,7 +23,7 @@ export class RoleService {
     async create(role: CreateRoleDto): Promise<Role> {
         const foundRole = await this.roleRepository.findOne({ where: { role_name: role.role_name } })
 
-        if(foundRole) throw new HttpException('Role name already exists', HttpStatus.BAD_REQUEST)
+        if (foundRole) throw new HttpException('Role name already exists', HttpStatus.BAD_REQUEST)
 
         const newRole = await this.roleRepository.create(role)
 

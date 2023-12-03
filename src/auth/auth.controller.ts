@@ -1,7 +1,9 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginParams } from './dto/login.dto';
 import ResponseDatLogin from './dto/responseDataLogin.dto';
+import { Response, Request } from 'express';
+import { CreatedSuccessResponse } from 'src/core/success.response';
 
 @Controller('auth')
 export class AuthController {
@@ -9,8 +11,8 @@ export class AuthController {
         private authService: AuthService
     ) { }
 
-    @Post()
-    async login(@Body() account: LoginParams, @Res({ passthrough: true }) res): Promise<Partial<ResponseDatLogin>> {
+    @Post('/login')
+    async login(@Body() account: LoginParams, @Res({ passthrough: true }) res: Response): Promise<Response> {
         const {
             user,
             accessToken,
@@ -22,9 +24,20 @@ export class AuthController {
             secure: true
         })
 
-        return {
-            user,
-            accessToken
-        }
+        return new CreatedSuccessResponse({
+            metadata: {
+                user,
+                accessToken
+            }
+        }).send(res)
+    }
+
+    @Post('/refresh-access-token')
+    async refreshAccessToken(@Res() res: Response, @Req() req: Request): Promise<Response> {
+        const refreshToken = req.cookies['refresh_token']
+
+        const accessToken = await this.authService.refreshAccessToken(refreshToken)
+
+        return new CreatedSuccessResponse({ metadata: { accessToken } }).send(res)
     }
 }
