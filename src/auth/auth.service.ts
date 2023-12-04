@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from './userToken.entity';
 import { Repository } from 'typeorm';
 import { cryptoHash } from 'src/utils/crypto.ultils';
+import { GoogleUser } from './dto/googleUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -118,6 +119,34 @@ export class AuthService {
 
         return accessToken
 
+    }
+
+    async googleLogin(googleUser: GoogleUser) {
+        if (!googleUser) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST)
+
+        const user = await this.userService.findOrCreateUser({ ...googleUser, is_register_by_google: true })
+
+        let payload = pickProperties(
+            user,
+            ['id', 'first_name', 'last_name', 'email']
+        )
+
+        const accessToken = await generateAccessToken(payload)
+
+        const refreshToken = await generateRefreshToken(payload)
+
+        const hashRefreshToken = await cryptoHash({ data: refreshToken, secret: this.jwtSecretRefreshToken })
+
+        await this.createUserToken({
+            hash_refresh_token: hashRefreshToken,
+            user: user
+        })
+
+        return {
+            user: payload,
+            accessToken,
+            refreshToken
+        }
     }
 }
 

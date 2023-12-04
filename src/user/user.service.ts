@@ -12,12 +12,12 @@ export class UserService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
         private roleService: RoleService
-    ) {}
+    ) { }
 
     async getUserByEmail(email: string) {
-        const foundUser = this.userRepository.findOne({where: {email}})
+        const foundUser = this.userRepository.findOne({ where: { email } })
 
-        if(!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
+        if (!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
 
         return foundUser
     }
@@ -28,14 +28,14 @@ export class UserService {
             role_id
         } = user
 
-        const foundUser = await this.userRepository.findOne({where: {email}})
+        const foundUser = await this.userRepository.findOne({ where: { email } })
 
-        if(foundUser) throw new HttpException('Email has already exits', HttpStatus.BAD_REQUEST)
+        if (foundUser) throw new HttpException('Email has already exits', HttpStatus.BAD_REQUEST)
 
         const foundRole = await this.roleService.findOne(role_id)
 
-        if(!foundRole) throw new HttpException('Role not found', HttpStatus.BAD_REQUEST)
-        
+        if (!foundRole) throw new HttpException('Role not found', HttpStatus.BAD_REQUEST)
+
         const newUser = await this.userRepository.create(user)
 
         const createdUser = await this.userRepository.save(newUser)
@@ -45,20 +45,29 @@ export class UserService {
 
     async search(keySearch): Promise<User[]> {
         const result = await this.userRepository
-        .createQueryBuilder('user')
-        .select([
-            'user.id',
-            'user.first_name',
-            'user.last_name',
-            'user.email',
-            'user.gender',
-            'user.telephone'
-        ])
-        .where('email ILIKE :keySearch', {keySearch: `%${keySearch}%`})
-        .orWhere('first_name ILIKE :keySearch', {keySearch: `%${keySearch}%`})
-        .orWhere('last_name ILIKE :keySearch', {keySearch: `%${keySearch}%`})
-        .getMany()
+            .createQueryBuilder('user')
+            .select([
+                'user.id',
+                'user.first_name',
+                'user.last_name',
+                'user.email',
+                'user.gender',
+                'user.telephone'
+            ])
+            .where('email ILIKE :keySearch', { keySearch: `%${keySearch}%` })
+            .orWhere('first_name ILIKE :keySearch', { keySearch: `%${keySearch}%` })
+            .orWhere('last_name ILIKE :keySearch', { keySearch: `%${keySearch}%` })
+            .getMany()
 
         return result
+    }
+
+    async findOrCreateUser(user: CreateUserDto): Promise<User> {
+        const foundUser = await this.userRepository.upsert(user, ['email'])
+
+        if(!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
+
+        return foundUser.raw[0]
+        
     }
 }

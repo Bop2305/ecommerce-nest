@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateUserDto {
     @IsNotEmpty()
@@ -17,9 +17,9 @@ export class CreateUserDto {
     @IsString()
     password: string
 
-    @IsNotEmpty()
     @IsString()
-    gender: string
+    @IsOptional()
+    gender?: string
 
     @IsDate()
     @IsOptional()
@@ -32,4 +32,8 @@ export class CreateUserDto {
     @IsString()
     @IsOptional()
     role_id?: string
+
+    @IsBoolean()
+    @IsOptional()
+    is_register_by_google?: boolean
 }

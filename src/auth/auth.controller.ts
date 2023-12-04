@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginParams } from './dto/login.dto';
-import ResponseDatLogin from './dto/responseDataLogin.dto';
 import { Response, Request } from 'express';
-import { CreatedSuccessResponse } from 'src/core/success.response';
+import { CreatedSuccessResponse, OKSuccessResponse } from 'src/core/success.response';
+import { GoogleOAuthGuard } from './guards/googleOAuth.guard';
+import { GoogleUser } from './dto/googleUser.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +25,8 @@ export class AuthController {
             secure: true
         })
 
-        return new CreatedSuccessResponse({
+        return new OKSuccessResponse({
+            message: 'Login success',
             metadata: {
                 user,
                 accessToken
@@ -39,5 +41,20 @@ export class AuthController {
         const accessToken = await this.authService.refreshAccessToken(refreshToken)
 
         return new CreatedSuccessResponse({ metadata: { accessToken } }).send(res)
+    }
+
+    @Get('/google-redirect')
+    @UseGuards(GoogleOAuthGuard)
+    async googleRedirect(@Req() req: Request) {
+        const param = req.user as GoogleUser
+        const { user, accessToken } = await this.authService.googleLogin(param)
+
+        return new OKSuccessResponse({
+            message: 'Login success',
+            metadata: {
+                user,
+                accessToken
+            }
+        })
     }
 }
