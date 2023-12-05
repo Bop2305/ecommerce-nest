@@ -6,6 +6,9 @@ import { CreatedSuccessResponse, OKSuccessResponse } from 'src/core/success.resp
 import { GoogleOAuthGuard } from './guards/googleOAuth.guard';
 import { GoogleUser } from './dto/googleUser.dto';
 import { JWTAuthenticationGuard } from './guards/jwtAuthentication.guard';
+import { Roles } from 'src/decorators/role.decorator';
+import { RoleGuard } from './guards/role.guard';
+import { EnumRole } from 'src/enums/role.enum';
 
 @Controller('auth')
 export class AuthController {
@@ -58,9 +61,10 @@ export class AuthController {
             }
         })
     }
-    
+
     @Get()
-    @UseGuards(JWTAuthenticationGuard)
+    @Roles(EnumRole.Admin)
+    @UseGuards(JWTAuthenticationGuard, RoleGuard)
     async auth() {
         return new OKSuccessResponse({})
     }

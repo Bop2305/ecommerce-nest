@@ -45,4 +45,17 @@ export class RoleService {
 
         if (!deletedRole.affected) throw new HttpException('Role not found', HttpStatus.BAD_REQUEST)
     }
+
+    async findRoleByUserId(userId: string): Promise<Role> {
+        const role = await this.roleRepository
+            .createQueryBuilder('roles')
+            .select()
+            .innerJoin('roles.users', 'users')
+            .where('users.id = :userId', { userId })
+            .getOne();
+
+        if(!role) throw new HttpException('Forbidden', HttpStatus.FORBIDDEN)
+
+        return role
+    }
 }

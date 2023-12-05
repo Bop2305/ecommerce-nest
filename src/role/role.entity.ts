@@ -1,5 +1,5 @@
-import { RolePermission } from "src/rolepermission/rolepermission.entity";
-import { Column, CreateDateColumn, Entity, Generated, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { User } from "src/user/user.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Role {
@@ -11,6 +11,9 @@ export class Role {
 
     @Column({ nullable: true })
     role_description: string
+
+    @OneToMany(() => User, user => user.role_id)
+    users: User[]
 
     @CreateDateColumn()
     created_at: Date
