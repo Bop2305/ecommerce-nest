@@ -5,6 +5,7 @@ import { Response, Request } from 'express';
 import { CreatedSuccessResponse, OKSuccessResponse } from 'src/core/success.response';
 import { GoogleOAuthGuard } from './guards/googleOAuth.guard';
 import { GoogleUser } from './dto/googleUser.dto';
+import { JWTAuthenticationGuard } from './guards/jwtAuthentication.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -56,5 +57,11 @@ export class AuthController {
                 accessToken
             }
         })
+    }
+    
+    @Get()
+    @UseGuards(JWTAuthenticationGuard)
+    async auth() {
+        return new OKSuccessResponse({})
     }
 }

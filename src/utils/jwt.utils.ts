@@ -32,6 +32,6 @@ export const verifyToken = async (token: string, secretToken: string ): Promise<
 
         return jwtDecoded as jwt.JwtPayload & User
     } catch (error) {
-        throw new HttpException('Authorization', HttpStatus.UNAUTHORIZED);
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 }
