@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserToken } from './userToken.entity';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { RoleModule } from 'src/role/role.module';
+import { PermissionModule } from 'src/permission/permission.module';
 
 @Module({
   controllers: [AuthController],
@@ -13,7 +14,8 @@ import { RoleModule } from 'src/role/role.module';
   imports: [
     TypeOrmModule.forFeature([UserToken]),
     UserModule,
-    RoleModule
+    RoleModule,
+    PermissionModule
   ]
 })
 export class AuthModule { }

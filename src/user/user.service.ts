@@ -14,8 +14,16 @@ export class UserService {
         private roleService: RoleService
     ) { }
 
-    async getUserByEmail(email: string) {
+    async getUserByEmail(email: string): Promise<User> {
         const foundUser = this.userRepository.findOne({ where: { email } })
+
+        if (!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
+
+        return foundUser
+    }
+
+    async findUserById(id: string): Promise<User> {
+        const foundUser = this.userRepository.findOne({ where: { id }, loadRelationIds: true })
 
         if (!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
 

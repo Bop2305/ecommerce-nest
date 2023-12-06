@@ -45,5 +45,17 @@ export class PermissionService {
 
         if (!deletedPermission.affected) throw new HttpException('Permission not found', HttpStatus.BAD_REQUEST)
     }
+
+    async findPermissionByRoleId(roleId: string): Promise<Permission[]> {
+        const permissions = await this.permissionRepository
+            .createQueryBuilder('permissions')
+            .select()
+            .innerJoin('permissions.role_permissions', 'rolePermission')
+            .innerJoin('rolePermission.role', 'roles')
+            .where('roles.id = :roleId', { roleId })
+            .getMany();
+
+        return permissions
+    }
 }
 

@@ -12,6 +12,9 @@ export class Permission {
     @Column({ nullable: true })
     permission_description: string
 
+    @OneToMany(() => RolePermission, rolePermission => rolePermission.permission)
+    role_permissions: RolePermission[]
+
     @CreateDateColumn()
     created_at: Date
 

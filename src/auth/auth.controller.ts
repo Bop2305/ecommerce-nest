@@ -9,6 +9,9 @@ import { JWTAuthenticationGuard } from './guards/jwtAuthentication.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { RoleGuard } from './guards/role.guard';
 import { EnumRole } from 'src/enums/role.enum';
+import { RequiredPermission } from 'src/decorators/permission.decorator';
+import { EnumPermission } from 'src/enums/permission.enum';
+import { PermissionGuard } from './guards/permission.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -64,7 +67,8 @@ export class AuthController {
 
     @Get()
     @Roles(EnumRole.Admin)
-    @UseGuards(JWTAuthenticationGuard, RoleGuard)
+    @RequiredPermission(EnumPermission.Select)
+    @UseGuards(JWTAuthenticationGuard, RoleGuard, PermissionGuard)
     async auth() {
         return new OKSuccessResponse({})
     }
