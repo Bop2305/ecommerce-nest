@@ -1,6 +1,7 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { hash } from "bcryptjs";
 import { Role } from "src/role/role.entity";
+import { PublicFile } from "src/files/publicFile.entity";
 
 @Entity()
 export class User {
@@ -38,6 +39,16 @@ export class User {
     @Column({ default: false })
     is_register_by_google: boolean
 
+    @OneToOne(() => PublicFile,
+        file => file.url, {
+        nullable: true
+    })
+    @JoinColumn({ name: 'avatar' })
+    avatar: PublicFile
+
+    @Column({ nullable: true })
+    google_avatar: string
+
     @CreateDateColumn()
     created_at: Date
 
@@ -46,8 +57,8 @@ export class User {
 
     @BeforeInsert()
     public async hashPassword() {
-        if(!this.password) return this.password = null
-        
+        if (!this.password) return this.password = null
+
         this.password = await hash(this.password, 10)
     }
 }

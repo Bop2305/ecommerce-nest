@@ -1,7 +1,7 @@
 import { User } from "src/user/user.entity";
 
-export interface GoogleUser extends User {
+export interface GoogleUser extends User{
     access_token: string
     refresh_token: string
-    avatar: string
+    avatar_url: string
 }

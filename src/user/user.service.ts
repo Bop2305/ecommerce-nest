@@ -5,13 +5,15 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { RoleService } from 'src/role/role.service';
 import { omitProperties } from 'src/utils/omitProperties.utils';
+import { FilesService } from 'src/files/file.service';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        private roleService: RoleService
+        private roleService: RoleService,
+        private fileService: FilesService
     ) { }
 
     async getUserByEmail(email: string): Promise<User> {
@@ -73,9 +75,22 @@ export class UserService {
     async findOrCreateUser(user: CreateUserDto): Promise<User> {
         const foundUser = await this.userRepository.upsert(user, ['email'])
 
-        if(!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
+        if (!foundUser) throw new HttpException('User not found', HttpStatus.BAD_REQUEST)
 
         return foundUser.raw[0]
-        
+    }
+
+    async addAvatar(userId: string, imageBuffer: Buffer, imageName: string): Promise<string> {
+        const file = await this.fileService.uploadPublicFile(imageBuffer, imageName)
+
+        if (!file) throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
+
+        await this.userRepository.update(userId, { avatar: file })
+
+        const updatedUser = await this.findUserById(userId)
+
+        if (!updatedUser) throw new HttpException('Update avatar failed', HttpStatus.BAD_REQUEST)
+
+        return file.url
     }
 }
