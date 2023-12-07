@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { RoleService } from 'src/role/role.service';
 import { omitProperties } from 'src/utils/omitProperties.utils';
 import { FilesService } from 'src/files/file.service';
+import { PaginationParams } from 'src/common/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -53,7 +54,15 @@ export class UserService {
         return omitProperties<User, 'password'>(createdUser, ['password'])
     }
 
-    async search(keySearch): Promise<User[]> {
+    async search(keySearch: string, pagination: PaginationParams): Promise<User[]> {
+        const {
+            order,
+            page,
+            perpage
+        } = pagination
+
+        const offset = (page - 1) * perpage
+
         const result = await this.userRepository
             .createQueryBuilder('user')
             .select([
@@ -67,8 +76,11 @@ export class UserService {
             .where('email ILIKE :keySearch', { keySearch: `%${keySearch}%` })
             .orWhere('first_name ILIKE :keySearch', { keySearch: `%${keySearch}%` })
             .orWhere('last_name ILIKE :keySearch', { keySearch: `%${keySearch}%` })
+            .skip(offset)
+            .take(perpage)
+            .orderBy('user.id', order)
             .getMany()
-
+        
         return result
     }
 

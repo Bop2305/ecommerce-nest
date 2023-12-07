@@ -7,7 +7,7 @@ import { config } from 'aws-sdk';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
