@@ -41,7 +41,8 @@ export class User {
 
     @OneToOne(() => PublicFile,
         file => file.url, {
-        nullable: true
+        nullable: true,
+        cascade: true
     })
     @JoinColumn({ name: 'avatar' })
     avatar: PublicFile

@@ -7,6 +7,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreatedSuccessResponse, OKSuccessResponse } from 'src/core/success.response';
 import { Response } from 'express';
 import { PaginationParams } from 'src/common/pagination.dto';
+import { BufferedFile } from 'src/minio/file.model';
 
 @Controller('user')
 export class UserController {
@@ -49,6 +50,19 @@ export class UserController {
     async addAvatar(@Req() req: Request, @Res() res: Response, @UploadedFile() file: Express.Multer.File) {
         const user = req['user']
         const avatar = await this.userService.addAvatar(user?.id, file.buffer, file.originalname)
+
+        return new CreatedSuccessResponse({
+            message: 'Update avatar success',
+            metadata: { avatar }
+        }).send(res)
+    }
+
+    @Post('/avatar/v2')
+    @UseGuards(JWTAuthenticationGuard)
+    @UseInterceptors(FileInterceptor('file'))
+    async addAvatarV2(@Req() req: Request, @Res() res: Response, @UploadedFile() file: BufferedFile) {
+        const user = req['user']
+        const avatar = await this.userService.addAvatarV2(user?.id, file)
 
         return new CreatedSuccessResponse({
             message: 'Update avatar success',

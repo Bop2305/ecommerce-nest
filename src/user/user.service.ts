@@ -7,6 +7,8 @@ import { RoleService } from 'src/role/role.service';
 import { omitProperties } from 'src/utils/omitProperties.utils';
 import { FilesService } from 'src/files/file.service';
 import { PaginationParams } from 'src/common/pagination.dto';
+import { ImageUploadService } from 'src/files/image-upload.service';
+import { BufferedFile } from 'src/minio/file.model';
 
 @Injectable()
 export class UserService {
@@ -14,7 +16,8 @@ export class UserService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
         private roleService: RoleService,
-        private fileService: FilesService
+        private fileService: FilesService,
+        private imageUploadService: ImageUploadService
     ) { }
 
     async getUserByEmail(email: string): Promise<User> {
@@ -91,7 +94,8 @@ export class UserService {
 
         return foundUser.raw[0]
     }
-
+    
+    // Upload file with s3
     async addAvatar(userId: string, imageBuffer: Buffer, imageName: string): Promise<string> {
         const file = await this.fileService.uploadPublicFile(imageBuffer, imageName)
 
@@ -105,4 +109,20 @@ export class UserService {
 
         return file.url
     }
+
+    //Upload file with minio
+    async addAvatarV2(userId: string, imageBuffer: BufferedFile): Promise<string> {
+        const file = await this.imageUploadService.upload(imageBuffer)
+
+        if (!file) throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR)
+
+        await this.userRepository.update(userId, { avatar: file })
+
+        const updatedUser = await this.findUserById(userId)
+
+        if (!updatedUser) throw new HttpException('Update avatar failed', HttpStatus.BAD_REQUEST)
+
+        return file.url
+    }
+
 }

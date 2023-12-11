@@ -9,10 +9,11 @@ import { RolepermissionModule } from './rolepermission/rolepermission.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
+import { MinioClientModule } from './minio/minio.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.env', }),
+    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -32,7 +33,8 @@ import { FilesModule } from './files/files.module';
     RolepermissionModule,
     UserModule,
     AuthModule,
-    FilesModule
+    FilesModule,
+    MinioClientModule
   ],
   controllers: [AppController],
   providers: [AppService],
